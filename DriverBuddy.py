@@ -1,8 +1,11 @@
 from idaapi import *
 from idautils import *
 from idc import *
+from ida_auto import auto_wait
 from DriverBuddy import data
 from DriverBuddy import ioctl
+
+
 '''#######################################################################################
 
 DriverBuddy.py: Entry point for IDA python plugin used in Windows driver
@@ -10,6 +13,8 @@ DriverBuddy.py: Entry point for IDA python plugin used in Windows driver
 
 Written by Braden Hollembaek and Adam Pond of NCC Group
 #######################################################################################'''
+def PLUGIN_ENTRY():
+    return DriverBuddyPlugin()
 
 class DriverBuddyPlugin(plugin_t):
     flags = PLUGIN_UNL
@@ -28,7 +33,7 @@ class DriverBuddyPlugin(plugin_t):
 
     def run(self, args):
         print "[+] Welcome to Driver Buddy"
-        autoWait() # Wait for IDA autoanalysis to complete
+        auto_wait() # Wait for IDA autoanalysis to complete
         driver_entry = data.is_driver()
 	if driver_entry == "":
             print "[-] No DriverEntry stub found"
@@ -49,13 +54,10 @@ class DriverBuddyPlugin(plugin_t):
         return
 
     def decode(self, _=0):
-        if idc.GetOpType(idc.ScreenEA(), 1) != 5:   # Immediate
+        if idc.get_operand_type(idc.get_screen_ea(), 1) != 5:   # Immediate
             return
-        value = idc.GetOperandValue(idc.ScreenEA(), 1) & 0xffffffff
+        value = idc.get_operand_value(idc.get_screen_ea(), 1) & 0xffffffff
         ioctl.get_ioctl_code(value)
 
     def term(self):
         pass
-
-def PLUGIN_ENTRY():
-    return DriverBuddyPlugin()

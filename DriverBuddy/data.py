@@ -67,7 +67,7 @@ def populate_function_map():
     ret = False
     # Populate function_map with sub functions
     for address in Functions():
-        name = GetFunctionName(address)
+        name = get_func_name(address)
         functions_map[name] = address
         ret = True
     # Populate function_map with import functions
@@ -228,7 +228,7 @@ def is_driver():
     driver_entry_address=""
     print "[+] Checking for DriverEntry..."
     for ea in Segments():
-        for funcea in Functions(SegStart(ea),SegEnd(ea)):
-            fn = GetFunctionName(funcea)
+        for funcea in Functions(get_segm_start(ea),get_segm_end(ea)):
+            fn = get_func_name(funcea)
             if fn == "DriverEntry":
                 return funcea

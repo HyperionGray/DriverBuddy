@@ -1,3 +1,8 @@
+
+This is a port of Driver buddy by nccgroup to IDA 7.4. IDA 7.4 broke many plugins, this a fixed version of this plugin that aids with driver analysis. It is for Python 2 + IDA.
+
+##OriginalDriverBuddy Docs
+
 ## Quickstart
 
 ### DriverBuddy Installation Instructions

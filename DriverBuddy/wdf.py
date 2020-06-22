@@ -5,9 +5,11 @@
 from idautils import *
 from idaapi import *
 from idc import *
+from ida_bytes import create_struct
+from ida_bytes import FF_QWORD
 
 # Architecture dependent globals
-FF_PTR = FF_QWRD # FF_DWRD
+FF_PTR = FF_QWORD # FF_DWRD
 get_ptr = get_64bit # get_32bit
 ptr_size = 8 # 4
 
@@ -474,7 +476,7 @@ def add_struct(version):
 
 def populate_wdf():
 	# find data sections
-	segment_starts = [get_segm_by_name('.data').startEA, get_segm_by_name('.rdata').startEA]
+	segment_starts = [get_segm_by_name('.data').start_ea, get_segm_by_name('.rdata').start_ea]
 	for ea in segment_starts:
 		if ea != BADADDR:
 			# find "KmdfLibrary" unicode string in .rdata section
@@ -483,15 +485,15 @@ def populate_wdf():
 				log('Found "KmdfLibrary" unicode string at ' + hex(idx))
 				addr = get_first_dref_to(idx)
 				# hacky logic fix , consider only the minor portion
-				version = int(str(Dword(addr+ptr_size+0x4)))
+				version = int(str(get_wide_dword(addr+ptr_size+0x4)))
 				id = add_struct(version)
 				if id != -1:
 					log('Success')
 					wdf_func = get_ptr(addr+ptr_size+0x10)
-					size = GetStrucSize(id)
-					log('doStruct (size=' + hex(size) + ') at ' +  hex(wdf_func))
+					size = get_struc_size(id)
+					log('create_struct (size=' + hex(size) + ') at ' +  hex(wdf_func))
 					do_unknown_range(wdf_func, size, 0)
-					if doStruct(wdf_func, size, id) and set_name(wdf_func, 'WdfFunctions', 0):
+					if create_struct(wdf_func, size, id) and set_name(wdf_func, 'WdfFunctions', 0):
 						log('Success')
 					else:
 						log('Failure')
